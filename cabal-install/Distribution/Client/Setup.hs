@@ -28,6 +28,7 @@ module Distribution.Client.Setup
     , reportCommand, ReportFlags(..)
     , runCommand
     , initCommand, IT.InitFlags(..)
+    , generateCommand, GT.GenerateFlags(..)
     , sdistCommand, SDistFlags(..), SDistExFlags(..), ArchiveFormat(..)
     , win32SelfUpgradeCommand, Win32SelfUpgradeFlags(..)
     , sandboxCommand, defaultSandboxLocation, SandboxFlags(..)
@@ -46,6 +47,8 @@ import Distribution.Client.Dependency.Types
          ( PreSolver(..) )
 import qualified Distribution.Client.Init.Types as IT
          ( InitFlags(..), PackageType(..) )
+import qualified Distribution.Client.Generate.Types as GT
+         ( GenerateFlags(..) )
 import Distribution.Client.Targets
          ( UserConstraint, readUserConstraint )
 
@@ -213,6 +216,34 @@ globalRepos globalFlags = remoteRepos ++ localRepos
     localRepos =
       [ Repo (Right LocalRepo) local
       | local <- globalLocalRepos globalFlags ]
+
+-- ------------------------------------------------------------
+-- * Generate flags
+-- ------------------------------------------------------------
+
+defaultGenerateFlags = 
+     GT.GenerateFlags { GT.testSuite = Flag True
+                      , GT.benchmark = Flag True
+                      }
+
+generateCommand :: CommandUI GT.GenerateFlags
+generateCommand = CommandUI {
+    commandName = "generate",
+    commandSynopsis = "Generate a module optionally with tests and benchmarks",
+    commandDescription = Just $ \_ -> wrapText $
+         "TODO",
+    commandUsage = \pname ->
+         "Usage: " ++ pname ++ " generate [FLAGS]\n\n"
+      ++ "Flags for generate:",
+    commandDefaultFlags = defaultGenerateFlags,
+    commandOptions = \_ -> []
+--      [ option ['n'] ["non-interactive"]
+--        "Non-interactive mode."
+--        IT.nonInteractive (\v flags -> flags { IT.nonInteractive = v })
+--        trueArg
+--      ]
+  }
+
 
 -- ------------------------------------------------------------
 -- * Config flags

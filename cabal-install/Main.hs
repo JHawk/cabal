@@ -30,6 +30,7 @@ import Distribution.Client.Setup
          , ReportFlags(..), reportCommand
          , runCommand
          , InitFlags(initVerbosity), initCommand
+         , GenerateFlags(generateVerbosity), generateCommand
          , SDistFlags(..), SDistExFlags(..), sdistCommand
          , Win32SelfUpgradeFlags(..), win32SelfUpgradeCommand
          , SandboxFlags(..), sandboxCommand
@@ -85,6 +86,7 @@ import Distribution.Client.Sandbox            (sandboxInit
                                               ,configPackageDB')
 
 import Distribution.Client.Init               (initCabal)
+import Distribution.Client.Generate           (generate)
 import qualified Distribution.Client.Win32SelfUpgrade as Win32SelfUpgrade
 
 import Distribution.Simple.Command
@@ -168,6 +170,7 @@ mainWorker args = topHandler $
       ,reportCommand          `commandAddAction` reportAction
       ,runCommand             `commandAddAction` runAction
       ,initCommand            `commandAddAction` initAction
+      ,generateCommand        `commandAddAction` generateAction
       ,configureExCommand     `commandAddAction` configureAction
       ,buildCommand           `commandAddAction` buildAction
       ,sandboxCommand         `commandAddAction` sandboxAction
@@ -672,6 +675,14 @@ initAction initFlags _extraArgs globalFlags = do
             comp
             conf
             initFlags
+
+generateAction :: GenerateFlags -> [String] -> GlobalFlags -> IO ()
+generateAction generateFlags _extraArgs globalFlags = do
+  let verbosity = fromFlag (generateVerbosity generateFlags)
+  config <- loadConfig verbosity (globalConfigFile globalFlags) mempty
+  let configFlags  = savedConfigureFlags config
+  (comp, _, conf) <- configCompilerAux' configFlags
+  generate verbosity generateFlags
 
 sandboxAction :: SandboxFlags -> [String] -> GlobalFlags -> IO ()
 sandboxAction sandboxFlags extraArgs globalFlags = do
